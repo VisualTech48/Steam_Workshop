@@ -345,25 +345,40 @@ public class SteamUGCTest : MonoBehaviour {
 			print("SteamUGC.DownloadItem(m_PublishedFileId, true) : " + SteamUGC.DownloadItem(m_PublishedFileId, true));
 		}
 	}
-
+	/// <summary>
+	/// Raises the steam UGC query completed event.
+	/// </summary>
+	/// <param name="pCallback">P callback.</param>
+	/// <param name="bIOFailure">If set to <c>true</c> b IO failure.</param>
 	void OnSteamUGCQueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure) {
 		Debug.Log("[" + SteamUGCQueryCompleted_t.k_iCallback + " - SteamUGCQueryCompleted_t] - " + pCallback.m_handle + " -- " + pCallback.m_eResult + " -- " + pCallback.m_unNumResultsReturned + " -- " + pCallback.m_unTotalMatchingResults + " -- " + pCallback.m_bCachedData);
 	}
-
+	/// <summary>
+	/// Raises the steam UGC request UGC details result event.
+	/// </summary>
+	/// <param name="pCallback">P callback.</param>
+	/// <param name="bIOFailure">If set to <c>true</c> b IO failure.</param>
 	void OnSteamUGCRequestUGCDetailsResult(SteamUGCRequestUGCDetailsResult_t pCallback, bool bIOFailure) {
 		Debug.Log("[" + SteamUGCRequestUGCDetailsResult_t.k_iCallback + " - SteamUGCRequestUGCDetailsResult_t] - " + pCallback.m_details + " -- " + pCallback.m_bCachedData);
 		Debug.Log(pCallback.m_details.m_nPublishedFileId + " -- " + pCallback.m_details.m_eResult + " -- " + pCallback.m_details.m_eFileType + " -- " + pCallback.m_details.m_nCreatorAppID + " -- " + pCallback.m_details.m_nConsumerAppID + " -- " + pCallback.m_details.m_rgchTitle + " -- " + pCallback.m_details.m_rgchDescription + " -- " + pCallback.m_details.m_ulSteamIDOwner + " -- " + pCallback.m_details.m_rtimeCreated + " -- " + pCallback.m_details.m_rtimeUpdated + " -- " + pCallback.m_details.m_rtimeAddedToUserList + " -- " + pCallback.m_details.m_eVisibility + " -- " + pCallback.m_details.m_bBanned + " -- " + pCallback.m_details.m_bAcceptedForUse + " -- " + pCallback.m_details.m_bTagsTruncated + " -- " + pCallback.m_details.m_rgchTags + " -- " + pCallback.m_details.m_hFile + " -- " + pCallback.m_details.m_hPreviewFile + " -- " + pCallback.m_details.m_pchFileName + " -- " + pCallback.m_details.m_nFileSize + " -- " + pCallback.m_details.m_nPreviewFileSize + " -- " + pCallback.m_details.m_rgchURL + " -- " + pCallback.m_details.m_unVotesUp + " -- " + pCallback.m_details.m_unVotesDown + " -- " + pCallback.m_details.m_flScore + " -- " + pCallback.m_details.m_unNumChildren);
 	}
-
-	void OnCreateItemResult(CreateItemResult_t pCallback, bool bIOFailure) {
+	/// <summary>
+	/// Raises the create item result event.
+	/// </summary>
+	/// <param name="pCallback">P callback.</param>
+	/// <param name="bIOFailure">If set to <c>true</c> b IO failure.</param>
+	static public void OnCreateItemResult(CreateItemResult_t pCallback, bool bIOFailure) {
 		Debug.Log("[" + CreateItemResult_t.k_iCallback + " - CreateItemResult_t] - " + pCallback.m_eResult + " -- " + pCallback.m_nPublishedFileId + " -- " + pCallback.m_bUserNeedsToAcceptWorkshopLegalAgreement);
 		m_PublishedFileId = pCallback.m_nPublishedFileId;
 	}
-
+	//
 	static public void OnSubmitItemUpdateResult(SubmitItemUpdateResult_t pCallback, bool bIOFailure) {
 		Debug.Log("[" + SubmitItemUpdateResult_t.k_iCallback + " - SubmitItemUpdateResult_t] - " + pCallback.m_eResult + " -- " + pCallback.m_bUserNeedsToAcceptWorkshopLegalAgreement);
 	}
-
+	/// <summary>
+	/// Raises the item installed event.
+	/// </summary>
+	/// <param name="pCallback">P callback.</param>
 	void OnItemInstalled(ItemInstalled_t pCallback) {
 		Debug.Log("[" + ItemInstalled_t.k_iCallback + " - ItemInstalled_t] - " + pCallback.m_unAppID + " -- " + pCallback.m_nPublishedFileId);
 	}
@@ -397,18 +412,24 @@ public class SteamUGCTest : MonoBehaviour {
 	static public void GetUGC(){
 		SteamAPICall_t handle = SteamUGC.RequestUGCDetails(m_PublishedFileId, 60);
 		OnSteamUGCRequestUGCDetailsResultCallResult.Set(handle);
-		CreateItem ();
+		//CreateItem ();
+	}
+
+	static public void SetItem(){
+		SteamAPICall_t handle = SteamUGC.CreateItem((AppId_t)503680, EWorkshopFileType.k_EWorkshopFileTypeCommunity);
+		OnCreateItemResultCallResult.Set(handle);
+		print("SteamUGC.CreateItem((AppId_t)503680, EWorkshopFileType.k_EWorkshopFileTypeCommunity) : " + handle);
 	}
 	static public void CreateItem(){
 		//GetUGC ();
-		SteamAPICall_t handle = SteamUGC.CreateItem((AppId_t)503680, EWorkshopFileType.k_EWorkshopFileTypeCommunity);
-		OnCreateItemResultCallResult.Set(handle);
-		print("SteamUGC.CreateItem((AppId_t)480, EWorkshopFileType.k_EWorkshopFileTypeWebGuide) : " + handle);
+
+
 		//
 		PublishedFileId_t[] PublishedFileIDs = new PublishedFileId_t[1]; // Use SteamUGCDetails_t::m_unNumChildren instead...
 		bool ret = SteamUGC.GetQueryUGCChildren(m_UGCQueryHandle, 0, PublishedFileIDs, (uint)PublishedFileIDs.Length);
 		print("SteamUGC.GetQueryUGCChildren(" + m_UGCQueryHandle + ", 0, PublishedFileIDs, " + (uint)PublishedFileIDs.Length + ") : " + ret + " -- " + PublishedFileIDs[0]);
 		//
+
 		m_UGCUpdateHandle = SteamUGC.StartItemUpdate((AppId_t)503680, m_PublishedFileId);
 		print("SteamUGC.StartItemUpdate((AppId_t)503680, " + m_PublishedFileId + ") : " + m_UGCUpdateHandle);
 		//
@@ -449,28 +470,3 @@ public class SteamUGCTest : MonoBehaviour {
 		print("SteamUGC.SubmitItemUpdate(" + m_UGCUpdateHandle + ", \"Test Changenote\") : " + handle);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
