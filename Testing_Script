@@ -1,0 +1,12 @@
+	static public void GetAllIDS(){
+		m_UGCQueryHandle = SteamUGC.CreateQueryUserUGCRequest(SteamUser.GetSteamID().GetAccountID(), 
+		                                                      EUserUGCList.k_EUserUGCList_Published, 
+		                                                      EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items, 
+		                                                      EUserUGCListSortOrder.k_EUserUGCListSortOrder_CreationOrderDesc, 
+		                                                      AppId_t.Invalid, 
+		                                                      SteamUtils.GetAppID(),
+		                                                      1);
+		SteamAPICall_t handle = SteamUGC.SendQueryUGCRequest(m_UGCQueryHandle);
+		OnSteamUGCQueryCompletedCallResult.Set(handle);
+	}
+}
